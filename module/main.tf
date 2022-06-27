@@ -6,7 +6,7 @@ data "aws_kms_secrets" "secret" {
   dynamic secret {
     for_each = var.parameters
     content {
-      name    = secret.value.key // 1. holds the yaml key ex: PASS1
+      name    = secret.value.key // 1. holds the yaml key ex: /test/myservice/PASS1
       payload = local.encrypted_secrets[secret.value.name] // 2. holds the yaml value for the key PASS1 ex: AQ....
     }
   }
