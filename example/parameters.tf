@@ -1,6 +1,6 @@
 module "example-service" {
   source              = "../module"
-  encrypted_file_path = "./example-service-secrets.yaml.encrypted"
+  encrypted_secrets_file_path = "./example-service-secrets.yaml.encrypted"
   parameters = [
     {
       key  = "/test/myservice/PASS1"
