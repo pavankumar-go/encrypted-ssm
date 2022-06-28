@@ -5,18 +5,18 @@
     1. AWS KMS key for encrypting your plain text passwords
 #### Steps
 ---
-##### 1. Let's say you need to encrypt and store your database password `ex: MyDBPassword1234`
+##### 1. Let's say you need to encrypt and store your database password `ex: MyDBPassword@!#%(*&$#*1234`
 ######  i. encrypt the plain text password using kms key
 ---
-    $ aws kms encrypt --key-id <YOUR_KMS_KEY_ID> --plaintext $(echo MyDBPassword1234 | base64) --no-cli-pager --query CiphertextBlob
+    $ aws kms encrypt --key-id <YOUR_KMS_KEY_ID> --plaintext $(echo 'MyDBPassword@!#%(*&$#*1234' | base64) --no-cli-pager --query CiphertextBlob
     ** notice the base64, because --plaintext arg expects a base64 input **
     
     which outputs a cipher text blob that looks like
-    "AQICAHihcFJ1Z7iE.................."
+    "AQ......."
 
-###### ii. store the output in a file 
+###### ii. store the output in a yaml file (we will staore all the secerts in a single yaml file)
 ---
-    $ echo "AQICAHihcFJ1Z7iE.................." > ./demo-service/ciplerblobs/mydbpassword.encr
+    $ echo "DBPASSWORD: AQ......." > mysecrets.yaml.encrypted
 
 ##### 2. Using terraform aws_ssm_parameter & aws_kms_secrets to push the encrypted passwords to AWS Pamater Store
 ---
@@ -24,17 +24,39 @@
 
 ```
 module "test-db-password" {
-  source              = "../module"
-  name                = "/test/myservice/DB_PASSWORD"
-  encrypted_file_path = "./ciplerblobs/mydbpassword.encr"
+  source                      = "../module"
+  encrypted_secrets_file_path = "./mysecrets.yaml.encrypted"
+  parameters                  = [    // list of parameters
+    {
+      key  = "/test/myservice/DBPASSWORD" // name of the parameter key that will hold the decrypted value in AWS Paramater Store
+      name = "DBPASSWORD"                 // yaml key as in "./mysecrets.yaml.encrypted" that holds encrypted value
+    }
+   ]
 }
 ```
 and run ` terraform init && terraform apply`
 
 
-#### Need to update the password for the same key ?
+#### To update the password or Adding another Paramater
 ---
 **Follow Step 1 and 2 again.**
-New updated password will be saved as Version 2
-Check `Envidences` folder for more info.
+New updated passwords will be saved as Version 2
 
+```
+module "example-service" {
+  source                      = "../module"
+  encrypted_secrets_file_path = "./mysecrets.yaml.encrypted"
+  parameters                  = [    // list of parameters
+    {
+      key  = "/test/myservice/DBPASSWORD"    // name of the parameter key that will hold the decrypted value in AWS Paramater Store
+      name = "DBPASSWORD"                    // yaml key as in "./mysecrets.yaml.encrypted" that holds encrypted value
+    },
+    {
+      key  = "/test/myservice/EMAIL_PASSWORD" // name of the parameter key that will hold the decrypted value in AWS Paramater Store
+      name = "EMAIL_PASSWORD"                 // yaml key as in "./mysecrets.yaml.encrypted" that holds encrypted value
+    }
+   ]
+}
+```
+
+Check `envidences` folder for more info.
