@@ -14,7 +14,7 @@
     which outputs a cipher text blob that looks like
     "AQ......."
 
-###### ii. store the output in a yaml file (we will staore all the secerts in a single yaml file)
+###### ii. store the output in a yaml file (we will staore all the secerts used by a service in a single yaml file)
 ---
     $ echo "DBPASSWORD: AQ......." > mysecrets.yaml.encrypted
 
