@@ -9,10 +9,6 @@ module "example-service" {
     {
       key  = "/test/myservice/PASS2"
       name = "PASS2"
-    },
-    {
-      key  = "/test/myservice/PASS3"
-      name = "PASS3"
     }
   ]
 }
